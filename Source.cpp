@@ -8,6 +8,7 @@ const int W = 25;
 const int H = 25;
 int x = 1;
 int y = 0;
+int score = 0;
 char grid[W*H];
 
 class Snake {
@@ -41,11 +42,28 @@ void initSnake() {
 	snek.alive = true;
 }
 
+void makeFood()
+{
+	bool pending = true;
+	while (pending) {
+		int pos = rand() % ((H - 2)*W) + W;
+		std::cout << pos;
+		if (grid[pos] != 'L' && grid[pos] != 'O') {
+			grid[pos] = 'X';
+			pending = false;
+		}
+	}
+}
+
 void move(int x, int y){
 	int newHead = snek.getHead() + x + y*W;
 	if (grid[newHead] == 'L' || grid[newHead] == 'O') snek.alive = false;
 	else {
-		if (grid[newHead] == 'X') snek.delay++;
+		if (grid[newHead] == 'X') {
+			snek.delay++;
+			score++;
+			makeFood();
+		}
 		snek.sequence.push_front(newHead);
 		grid[newHead] = 'O';
 		if (snek.delay == 0) {
@@ -93,6 +111,8 @@ void changeDirection(char k) {
 		break;
 	}
 }
+
+
 void printGrid()
 {
 	for (int i = 0; i < W; i++) {
@@ -107,6 +127,7 @@ int main()
 {
 	initGrid();
 	initSnake();
+	makeFood();
 	while (snek.alive) {
 		if (_kbhit()) {
 			changeDirection(_getch());
@@ -115,8 +136,10 @@ int main()
 		move(x, y);
 		system("cls");
 		printGrid();
-		std::cout << "X is " << x << " Y is " << y << std::endl;
-		Sleep(500);
+		std::cout << "Score: " << score << std::endl;
+		//std::cout << "X is " << x << " Y is " << y << std::endl;
+		Sleep(250);
 	}
+	std::cout << "Game over!" << std::endl;
 	
 }
